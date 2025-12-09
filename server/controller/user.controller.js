@@ -68,4 +68,87 @@ const loginUsers = async (req, res) => {
   }
 };
 
-module.exports = { createUser, loginUsers };
+// GET ALL USERS
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await UserModel.find();
+    return res.status(200).json({
+      message: "Users fetched successfully",
+      data: users,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to fetch users" });
+  }
+};
+
+// GET ONE USER
+const getOneUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await UserModel.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: "User fetched successfully",
+      data: user,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to fetch user" });
+  }
+};
+// UPDATE USER
+const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    // If updating password, hash it
+    if (updates.Password) {
+      updates.Password = await bcrypt.hash(updates.Password, 10);
+    }
+
+    const updatedUser = await UserModel.findByIdAndUpdate(id, updates, {
+      new: true,
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: "User updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to update user" });
+  }
+};
+// DELETE USER
+const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await UserModel.findByIdAndDelete(id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to delete user" });
+  }
+};
+
+module.exports = {
+  createUser,
+  loginUsers,
+  getAllUsers,
+  getOneUser,
+  updateUser,
+  deleteUser,
+};
