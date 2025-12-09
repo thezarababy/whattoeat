@@ -5,6 +5,10 @@ const authValidator = require("../middleware/authValidator.js");
 
 router.post("/signup", createUser);
 router.post("/login", loginUsers);
+router.get("/", getAllUsers);
+router.get("/:id", getOneUser);
+router.put("/:id", updateUser);
+router.delete("/:id", deleteUser);
 router.get("/protected", authValidator, (req, res) => {
   res
     .status(200)
